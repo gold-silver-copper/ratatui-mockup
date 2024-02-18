@@ -8,11 +8,15 @@ use bevy::{
     prelude::*,
 };
 
+
+use bevy::app::AppExit;
+
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, FrameTimeDiagnosticsPlugin))
         .add_systems(Startup, setup)
         .add_systems(Update, (text_update_system, text_color_system))
+        .add_systems(Update, keyboard_input)
         .run();
 }
 
@@ -104,3 +108,29 @@ fn text_update_system(
         }
     }
 }
+
+
+
+
+fn keyboard_input(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut exit: EventWriter<AppExit>
+) {
+    if keys.just_pressed(KeyCode::KeyQ) {
+        exit.send(AppExit);
+    }
+    if keys.just_released(KeyCode::ControlLeft) {
+        // Left Ctrl was released
+    }
+    if keys.pressed(KeyCode::KeyW) {
+        // W is being held down
+    }
+    // we can check multiple at once with `.any_*`
+    if keys.any_pressed([KeyCode::ShiftLeft, KeyCode::ShiftRight]) {
+        // Either the left or right shift are being held down
+    }
+    if keys.any_just_pressed([KeyCode::Delete, KeyCode::Backspace]) {
+        // Either delete or backspace was just pressed
+    }
+}
+
