@@ -77,6 +77,20 @@ struct VirtualCell{
 
 }
 
+
+trait FromRatCell {
+
+    fn to_virtual_cell(given_cell: &Cell) -> VirtualCell ;
+}
+
+impl FromRatCell for VirtualCell {
+
+    fn to_virtual_cell(given_cell: &Cell)-> VirtualCell  {
+
+        todo!();
+    }
+}
+
 fn font_setup( asset_server: Res<AssetServer>){todo!()}
 
 
@@ -86,24 +100,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Text with one section
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
-        TextBundle::from_section(
-            // Accepts a `String` or any type that converts into a `String`, such as `&str`
-            "╬",
-            TextStyle {
-                // This font is loaded and will be used instead of the default font.
-                font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
-                font_size: 100.0,
-                ..default()
-            },
-        ) // Set the justification of the Text
-        .with_text_justify(JustifyText::Center)
-        // Set the style of the TextBundle itself.
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            bottom: Val::Px(0.0),
-            left: Val::Px(0.0),
-            ..default()
-        }),
+        VirtualTerminal::default(),
+   
         // ADD TERMINAL OR CELLS HERE,
     )); 
     commands.spawn((
@@ -162,10 +160,10 @@ fn keyboard_input(keys: Res<ButtonInput<KeyCode>>, mut exit: EventWriter<AppExit
     }
 }
 
-fn draw_cell(x: u16, y: u16, glyph_cell: &Cell, mut commands: Commands, asset_server: Res<AssetServer>) {
+fn draw_cell(x: u16, y: u16, glyph_cell: &VirtualCell, mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let scalar:u16 = 2;
-    let glyph_symbol = glyph_cell.symbol();
+    let glyph_symbol = &glyph_cell.symbol;
 
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
