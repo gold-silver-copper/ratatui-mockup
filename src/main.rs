@@ -35,6 +35,7 @@ struct VirtualTerminal{
 // A unit struct to help identify the color-changing Text component
 #[derive(Component)]
 struct VirtualCell{
+    symbol: String,
     fg: BevyColor,
     bg: BevyColor,
     underline_color: Option<BevyColor>,
@@ -48,16 +49,13 @@ struct VirtualCell{
     reversed:bool,
     hidden:bool,
     crossed_out:bool,
+    row: u16,
+    column: u16
 
 }
 
-#[derive(Component)]
-struct VirtualCellPos{
-    x: u16,
-    y:u16
+fn font_setup( asset_server: Res<AssetServer>){todo!()}
 
-
-}
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // UI camera
