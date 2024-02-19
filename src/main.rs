@@ -35,8 +35,8 @@ struct VirtualTerminal {
 impl Default for VirtualTerminal {
     fn default() -> Self {
         VirtualTerminal {
-            term_rows: 40,
-            term_columns: 30,
+            term_rows: 10,
+            term_columns: 5,
             term_font_size: 40.0,
             default_bg: bevy::prelude::Color::GRAY,
             default_fg: bevy::prelude::Color::WHITE,
@@ -119,15 +119,31 @@ fn setup_camera_and_terminal(mut commands: Commands) {
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
         VirtualTerminal::default(),
+        Text2dBundle::default(),
         // ADD TERMINAL OR CELLS HERE,
     ));
 }
 
-fn init_virtual_cells(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((VirtualCell::new(0, 0)));
-    commands.spawn((VirtualCell::new(1, 1)));
-    commands.spawn((VirtualCell::new(0, 1)));
-    commands.spawn((VirtualCell::new(1, 0)));
+fn init_virtual_cells(
+    query_terminal: Query<(Entity, &VirtualTerminal)>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    for (e, termii) in query_terminal.iter() {
+        let rows = termii.term_rows;
+        let columns = termii.term_columns;
+        let fg = termii.default_fg;
+        let bg = termii.default_bg;
+
+        for x in 0..columns {
+            for y in 0..rows {
+                let child = commands.spawn((VirtualCell::new(x, y))).id();
+                println!("{child:?}");
+
+                commands.entity(e).add_child(child);
+            }
+        }
+    }
 }
 
 fn add_render_to_cells(
@@ -136,28 +152,25 @@ fn add_render_to_cells(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-
-
-    let mut fontsize = 200.0 ;
+    let mut fontsize = 200.0;
 
     for termii in query_terminal.iter() {
-
-       fontsize = termii.term_font_size;
-
-
+        fontsize = termii.term_font_size;
     }
 
-    let pixel_shift = fontsize/2.0;
+    let pixel_shift = fontsize / 2.0;
 
     for (entity_id, cellii) in query_cells.iter() {
+        let symbole = &cellii.symbol;
+
         commands.entity(entity_id).insert(
             TextBundle::from_section(
                 // Accepts a `String` or any type that converts into a `String`, such as `&str`
-                &cellii.symbol,
+                symbole,
                 TextStyle {
                     // This font is loaded and will be used instead of the default font.
                     font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
-                    font_size: fontsize ,
+                    font_size: fontsize,
                     ..default()
                 },
             ) // Set the justification of the Text
@@ -165,8 +178,8 @@ fn add_render_to_cells(
             // Set the style of the TextBundle itself.
             .with_style(Style {
                 position_type: PositionType::Absolute,
-                bottom: Val::Px(cellii.row as f32 *fontsize),
-                left: Val::Px(cellii.column as f32 *pixel_shift),
+                bottom: Val::Px(cellii.row as f32 * fontsize),
+                left: Val::Px(cellii.column as f32 * pixel_shift),
                 ..default()
             }),
         );
