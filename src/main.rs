@@ -16,7 +16,8 @@ fn main() {
     App::new()
         .add_plugins((DefaultPlugins, FrameTimeDiagnosticsPlugin))
         .init_resource::<VirtualTerminal>()
-        .add_systems(PreStartup, setup_camera_and_terminal)
+        .init_resource::<FontHandlers>()
+        .add_systems(PreStartup, (setup_camera_and_terminal,font_setup))
         .add_systems(Startup, init_virtual_cells)
         .add_systems(PostStartup, add_render_to_cells)
         .add_systems(Update, keyboard_input)
@@ -44,6 +45,28 @@ impl Default for VirtualTerminal {
         }
     }
 }
+
+
+#[derive(Resource)]
+struct FontHandlers {
+
+    normal: Handle<Font>,
+
+
+}
+
+impl Default for FontHandlers {
+
+    fn default() -> Self {
+
+        FontHandlers{
+
+            normal: Handle::weak_from_u128(101),
+        }
+
+    }
+}
+
 
 // A unit struct to help identify the color-changing Text component
 #[derive(Component)]
@@ -109,8 +132,10 @@ impl FromRatCell for VirtualCell {
     }
 }
 
-fn font_setup(asset_server: Res<AssetServer>) {
-    todo!()
+fn font_setup(asset_server: Res<AssetServer>, mut font_handlers: ResMut<FontHandlers>) {
+    let big_handle : Handle<Font>= asset_server.load("fonts/DejaVuSansMono.ttf");
+    font_handlers.normal = big_handle;
+  
 }
 
 fn setup_camera_and_terminal(mut commands: Commands) {
@@ -120,11 +145,20 @@ fn setup_camera_and_terminal(mut commands: Commands) {
  
 }
 
-fn init_virtual_cells(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((VirtualCell::new(0, 0)));
-    commands.spawn((VirtualCell::new(1, 1)));
-    commands.spawn((VirtualCell::new(0, 1)));
-    commands.spawn((VirtualCell::new(1, 0)));
+fn init_virtual_cells(mut commands: Commands,terminal_res: Res<VirtualTerminal>, asset_server: Res<AssetServer>) {
+
+    let rows = terminal_res.term_rows;
+    let columns = terminal_res.term_columns;
+
+    for y in 0..rows{
+        for x in 0..columns {
+            commands.spawn((VirtualCell::new(x, y)));
+
+
+
+        } 
+    }
+    
 }
 
 fn add_render_to_cells(
@@ -132,10 +166,12 @@ fn add_render_to_cells(
     terminal_res: Res<VirtualTerminal>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    font_handlers: Res<FontHandlers>
 ) {
 
 
     let mut fontsize = terminal_res.term_font_size;
+    
 
     let pixel_shift = fontsize/2.0;
 
@@ -146,7 +182,7 @@ fn add_render_to_cells(
                 &cellii.symbol,
                 TextStyle {
                     // This font is loaded and will be used instead of the default font.
-                    font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
+                    font: font_handlers.normal.clone(),
                     font_size: fontsize ,
                     ..default()
                 },
