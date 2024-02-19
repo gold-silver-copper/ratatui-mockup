@@ -81,7 +81,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             left: Val::Px(0.0),
             ..default()
         }),
-        ColorText,
+        // ADD TERMINAL OR CELLS HERE,
     ));
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
@@ -103,7 +103,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             left: Val::Px(50.0),
             ..default()
         }),
-        ColorText,
+        // ADD TERMINAL OR CELLS HERE,
     ));
 
 
@@ -143,7 +143,7 @@ fn draw_cell(x: u16, y: u16, glyph_cell: &Cell, mut commands: Commands, asset_se
             width: Val::Px(30.0),
             ..default()
         }),
-        ColorText,
+        // ADD TERMINAL OR CELLS HERE,
     ));
 
     todo!()
