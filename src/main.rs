@@ -32,6 +32,29 @@ struct VirtualTerminal{
 
 }
 
+impl Default for VirtualTerminal {
+
+
+    fn default() -> Self {
+
+        VirtualTerminal{
+
+
+
+            term_rows : 40,
+            term_columns : 30,
+            term_font_size: 20,
+            default_bg: bevy::prelude::Color::GRAY,
+            default_fg: bevy::prelude::Color::WHITE,
+
+
+        }
+
+
+
+    }
+}
+
 // A unit struct to help identify the color-changing Text component
 #[derive(Component)]
 struct VirtualCell{
@@ -105,6 +128,28 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }),
         // ADD TERMINAL OR CELLS HERE,
     ));
+    commands.spawn((
+        // Create a TextBundle that has a Text with a single section.
+        TextBundle::from_section(
+            // Accepts a `String` or any type that converts into a `String`, such as `&str`
+            "╬",
+            TextStyle {
+                // This font is loaded and will be used instead of the default font.
+                font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
+                font_size: 100.0,
+                ..default()
+            },
+        ) // Set the justification of the Text
+        .with_text_justify(JustifyText::Center)
+        // Set the style of the TextBundle itself.
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            bottom: Val::Px(0.0),
+            left: Val::Px(100.0),
+            ..default()
+        }),
+        // ADD TERMINAL OR CELLS HERE,
+    )); 
 
 
 }
