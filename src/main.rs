@@ -82,7 +82,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         }),
         // ADD TERMINAL OR CELLS HERE,
-    ));
+    )); 
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
         TextBundle::from_section(
