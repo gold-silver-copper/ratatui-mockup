@@ -15,6 +15,7 @@ use ratatui::buffer::Cell;
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, FrameTimeDiagnosticsPlugin))
+        .init_resource::<VirtualTerminal>()
         .add_systems(PreStartup, setup_camera_and_terminal)
         .add_systems(Startup, init_virtual_cells)
         .add_systems(PostStartup, add_render_to_cells)
@@ -23,7 +24,7 @@ fn main() {
 }
 
 // A unit struct to help identify the FPS UI component, since there may be many Text components
-#[derive(Component)]
+#[derive(Resource)]
 struct VirtualTerminal {
     term_rows: u16,
     term_columns: u16,
@@ -116,11 +117,7 @@ fn setup_camera_and_terminal(mut commands: Commands) {
     // UI camera
     commands.spawn(Camera2dBundle::default());
     // Text with one section
-    commands.spawn((
-        // Create a TextBundle that has a Text with a single section.
-        VirtualTerminal::default(),
-        // ADD TERMINAL OR CELLS HERE,
-    ));
+ 
 }
 
 fn init_virtual_cells(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -132,20 +129,13 @@ fn init_virtual_cells(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn add_render_to_cells(
     query_cells: Query<(Entity, &VirtualCell)>,
-    query_terminal: Query<&VirtualTerminal>,
+    terminal_res: Res<VirtualTerminal>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
 
 
-    let mut fontsize = 200.0 ;
-
-    for termii in query_terminal.iter() {
-
-       fontsize = termii.term_font_size;
-
-
-    }
+    let mut fontsize = terminal_res.term_font_size;
 
     let pixel_shift = fontsize/2.0;
 
