@@ -3,13 +3,13 @@
 //! It displays the current FPS in the top left corner, as well as text that changes color
 //! in the bottom right. For text within a scene, please see the text2d example.
 
+use bevy::app::AppExit;
 use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
-
-
-use bevy::app::AppExit;
+//use ratatui::style::Style;
+use ratatui::buffer::Cell;
 
 fn main() {
     App::new()
@@ -68,7 +68,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 },
             ),
-            TextSection::from_style( TextStyle {
+            TextSection::from_style(TextStyle {
                 font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
                 font_size: 60.0,
                 color: Color::GOLD,
@@ -76,9 +76,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ]),
         FpsText,
     ));
-
-
-  
 }
 
 fn text_color_system(time: Res<Time>, mut query: Query<&mut Text, With<ColorText>>) {
@@ -109,28 +106,40 @@ fn text_update_system(
     }
 }
 
-
-
-
-fn keyboard_input(
-    keys: Res<ButtonInput<KeyCode>>,
-    mut exit: EventWriter<AppExit>
-) {
+fn keyboard_input(keys: Res<ButtonInput<KeyCode>>, mut exit: EventWriter<AppExit>) {
     if keys.just_pressed(KeyCode::KeyQ) {
         exit.send(AppExit);
     }
-    if keys.just_released(KeyCode::ControlLeft) {
-        // Left Ctrl was released
-    }
-    if keys.pressed(KeyCode::KeyW) {
-        // W is being held down
-    }
-    // we can check multiple at once with `.any_*`
-    if keys.any_pressed([KeyCode::ShiftLeft, KeyCode::ShiftRight]) {
-        // Either the left or right shift are being held down
-    }
-    if keys.any_just_pressed([KeyCode::Delete, KeyCode::Backspace]) {
-        // Either delete or backspace was just pressed
-    }
 }
 
+fn draw_cell(x: u16, y: u16, glyph_cell: &Cell, mut commands: Commands, asset_server: Res<AssetServer>) {
+
+    let scalar:u16 = 2;
+    let glyph_symbol = glyph_cell.symbol();
+
+    commands.spawn((
+        // Create a TextBundle that has a Text with a single section.
+        TextBundle::from_section(
+            // Accepts a `String` or any type that converts into a `String`, such as `&str`
+            glyph_symbol,
+            TextStyle {
+                // This font is loaded and will be used instead of the default font.
+                font: asset_server.load("fonts/DejaVuSansMono-Oblique.ttf"),
+                font_size: 30.0,
+                ..default()
+            },
+        ) // Set the justification of the Text
+        .with_text_justify(JustifyText::Center)
+        // Set the style of the TextBundle itself.
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: Val::Px(30.0),
+            left: Val::Px(30.0),
+            width: Val::Px(30.0),
+            ..default()
+        }),
+        ColorText,
+    ));
+
+    todo!()
+}
