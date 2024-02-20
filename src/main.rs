@@ -9,6 +9,7 @@ use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
+use bevy::utils::HashMap;
 //use ratatui::style::Style;
 use ratatui::buffer::Cell;
 
@@ -32,16 +33,18 @@ struct VirtualTerminal {
     term_font_size: f32,
     default_bg: BevyColor,
     default_fg: BevyColor,
+    entity_map: HashMap<(u16,u16),Entity>
 }
 
 impl Default for VirtualTerminal {
     fn default() -> Self {
         VirtualTerminal {
-            term_rows: 40,
-            term_columns: 30,
+            term_rows: 20,
+            term_columns:10,
             term_font_size: 40.0,
             default_bg: bevy::prelude::Color::GRAY,
             default_fg: bevy::prelude::Color::WHITE,
+            entity_map: HashMap::new(),
         }
     }
 }
@@ -145,14 +148,16 @@ fn setup_camera_and_terminal(mut commands: Commands) {
  
 }
 
-fn init_virtual_cells(mut commands: Commands,terminal_res: Res<VirtualTerminal>, asset_server: Res<AssetServer>) {
+fn init_virtual_cells(mut commands: Commands,mut terminal_res: ResMut<VirtualTerminal>, asset_server: Res<AssetServer>) {
 
     let rows = terminal_res.term_rows;
     let columns = terminal_res.term_columns;
 
     for y in 0..rows{
         for x in 0..columns {
-            commands.spawn((VirtualCell::new(x, y)));
+            let cell = commands.spawn((VirtualCell::new(x, y))).id();
+            terminal_res.entity_map.insert((x,y),cell);
+
 
 
 
