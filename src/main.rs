@@ -6,7 +6,7 @@
 use bevy::app::AppExit;
 use bevy::prelude::Color as BevyColor;
 use bevy::{
-    diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
+   
     prelude::*,
 };
 use bevy::utils::HashMap;
@@ -15,7 +15,7 @@ use ratatui::buffer::Cell;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, FrameTimeDiagnosticsPlugin))
+        .add_plugins((DefaultPlugins))
         .init_resource::<VirtualTerminal>()
         .init_resource::<FontHandlers>()
         .add_systems(PreStartup, (setup_camera_and_terminal,font_setup))
@@ -170,7 +170,6 @@ fn add_render_to_cells(
     query_cells: Query<(Entity, &VirtualCell)>,
     terminal_res: Res<VirtualTerminal>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     font_handlers: Res<FontHandlers>
 ) {
 
